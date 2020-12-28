@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/GIF" href="./icon.png">
+  <title>00:00:00</title>
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: 'Monaco';
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+  }
+
+  .alarm-clock-wrap {
+    width: 100%;
+    height: 100%;
+    background-color: #163e6b;
+    overflow: hidden;
+
+    position: relative;
+  }
+
+  .menu-tab-box {
+    z-index: 1000;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #ffffff;
+  }
+
+  .menu-tab-box .hh,
+  .menu-tab-box .mm,
+  .menu-tab-box .ss {
+    font-size: 26px;
+    font-weight: bold;
+    margin: 0 10px;
+    color: #ffffff;
+  }
+
+
+  .menu-tab-box .menu-icon {
+    width: 40px;
+  }
+
+  .setting-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+
+    width: 100%;
+    height: 200px;
+    color: #ffffff;
+    background-color: #12355e;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .setting-box .title,
+  .setting-box .detail1,
+  .setting-box .detail2,
+  .setting-box .detail3 {
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .setting-box input {
+    width: 100px;
+    height: 40px;
+    box-sizing: border-box;
+
+    font-weight: bold;
+    font-size: 28px;
+  }
+
+  .setting-box .start-btn {
+    width: 100px;
+    height: 40px;
+    margin-left: 10px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .date-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    color: #ffffff;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .date-box .count-down .hh,
+  .date-box .count-down .mm,
+  .date-box .count-down .ss {
+    font-size: 120px;
+    font-weight: bold;
+    margin: 0 20px;
+  }
+
+  .GM-none {
+    display: none;
+  }
+</style>
+
+<body>
+  <script src="https://mstatic.gzstv.com/static/lib/jquery/dist/jquery.min.js"></script>
+
+  <div class="alarm-clock-wrap">
+    <div class="now-date">
+
+    </div>
+    <div class="menu-tab-box" id="menuTab">
+      <span class="hh" id="nowHH">00</span>:
+      <span class="mm" id="nowMM">00</span>:
+      <span class="ss" id="nowSS">00</span>
+      <img src="./menu-icon.png" alt="/menu-icon" class="menu-icon">
+
+    </div>
+    <div class="setting-box GM-none">
+      <div class="title">默认时间段：</div>
+      <div class="detail1"></div>
+      <div class="detail2"></div>
+      <div class="detail3"></div>
+      <div>
+        <input type="number" id="inputHH" value="00">:
+        <input type="number" id="inputMM" value="00">:
+        <input type="number" id="inputSS" value="00">
+        <button class="start-btn" id="startBtn">START</button>
+      </div>
+    </div>
+    <div class="date-box">
+      <div class="count-down">
+        <span class="hh" id="countDownHH">00</span>:
+        <span class="mm" id="countDownMM">00</span>:
+        <span class="ss" id="countDownSS">00</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    var setTime = '' // 设置闹钟的时间
+    var setTimeArr = [] // 设置3个固定的闹钟的时间
+    var nowYYYY = '' // 现在年
+    var nowMonth = '' // 现在月
+    var nowDD = '' // 现在日
+
+    var nowDateTime = '' // 现在时间 yyyy-mm-dd hh:mm:ss
+    var YYYYMMDD = '' // 现在时间 yyyy-mm-dd
+    var nowHH = '' // 现在时间
+    var nowMM = ''
+    var nowSS = ''
+    var downHH = '' // 倒计时时间
+    var downMM = ''
+    var downSS = ''
+    var initHH = '' // 初始化显示在input框中的时间
+    var initMM = ''
+    var initSS = ''
+
+    $(function () {
+      init()
+      initEvent()
+    })
+
+    function init() {
+      // $.formatData()
+      // var initHH = ''
+      initHH = $.formatData().hh
+      initMM = $.formatData().mm
+      initSS = $.formatData().ss
+      initDate()
+      setInterval(() => {
+        nowDateTime = $.formatData().time
+        YYYYMMDD = $.formatData().YYYYMMDD
+        nowYYYY = $.formatData().year
+        nowMonth = $.formatData().month
+        nowDD = $.formatData().day
+        nowHH = $.formatData().hh
+        nowMM = $.formatData().mm
+        nowSS = $.formatData().ss
+        setTimeArr = [
+          { timeYYYYMMDD: '' + YYYYMMDD + ' ' + '12' + ':' + '00' + ':' + '00' },
+          { timeYYYYMMDD: '' + YYYYMMDD + ' ' + '17' + ':' + '30' + ':' + '00' },
+          { timeYYYYMMDD: '' + $.formatDataNext().YYYYMMDD + ' ' + '01' + ':' + '00' + ':' + '00' }
+        ]
+        downNowDate(setTime || setTimeArr)
+        initDetailDate(setTimeArr)
+        nowDate()
+      }, 1000);
+    }
+    // YYYYMMDD: "2020-12-28"
+    // day: 28
+    // hh: 11
+    // mm: 44
+    // month: 12
+    // ss: 44
+    // time: "2020-12-28 11:44:44"
+    // year: 2020
+
+    function initEvent() {
+      $('#startBtn').on('click', function () {
+        var inputHH = $('#inputHH').val()
+        var inputMM = $('#inputMM').val()
+        var inputSS = $('#inputSS').val()
+        if (inputHH == '' || inputMM == '' || inputSS == '') {
+          setTime = ''
+          alert('时间为空不生效~~~')
+          return
+        }
+        setTime = '' + `${YYYYMMDD} ${inputHH}:${inputMM}:${inputSS}`
+      })
+
+      $('#menuTab').on("click", function () {
+        var visible = $(".setting-box").is(":hidden")
+        if (visible) {
+          $(".setting-box").fadeIn(300).css('display', 'flex');
+        } else {
+          $(".setting-box").fadeOut(300);
+        }
+      })
+    }
+
+    function nowDate() {
+      $('#nowHH').html(nowHH)
+      $('#nowMM').html(nowMM)
+      $('#nowSS').html(nowSS)
+
+    }
+    function initDate() {
+      $('#inputHH').val(initHH)
+      $('#inputMM').val(initMM)
+      $('#inputSS').val('00')
+    }
+
+    function initDetailDate(setTimeArr) {
+      $('.detail1').html(setTimeArr[0].timeYYYYMMDD)
+      $('.detail2').html(setTimeArr[1].timeYYYYMMDD)
+      $('.detail3').html(setTimeArr[2].timeYYYYMMDD)
+
+      // setTimeArr = [
+      //     { timeYYYYMMDD: '' + YYYYMMDD + ' ' + '12' + ':' + '00' + ':' + '00' },
+      //     { timeYYYYMMDD: '' + YYYYMMDD + ' ' + '17' + ':' + '30' + ':' + '00' },
+      //     { timeYYYYMMDD: '' + $.formatDataNext().YYYYMMDD + ' ' + '01' + ':' + '00' + ':' + '00' }
+      //   ]
+    }
+
+    function downNowDate(setTime) {
+      // setTimeArr
+      var tempTime = ''
+      var currentTimestamp = new Date().getTime();
+      if (Array.isArray(setTime)) {
+        var setTime1 = new Date(setTime[0].timeYYYYMMDD.replace(/-/g, '/').valueOf())
+        var setTime2 = new Date(setTime[1].timeYYYYMMDD.replace(/-/g, '/').valueOf())
+        var setTime3 = new Date(setTime[2].timeYYYYMMDD.replace(/-/g, '/').valueOf())
+        if (setTime1 - currentTimestamp > 0) {
+          tempTime = setTime1
+        } else if (setTime2 - currentTimestamp > 0) {
+          tempTime = setTime2
+        } else if (setTime3 - currentTimestamp > 0) {
+          tempTime = setTime3
+        }
+      } else {
+        tempTime = (new Date(setTime.replace(/-/g, '/').valueOf()))
+      }
+
+      var countDown;
+      var setTimestamp = tempTime;
+      countDown = (setTimestamp - currentTimestamp);
+      if (countDown <= 0) {
+        // alert('设置时间不能小于当前时间哦~~~')
+        return;
+      }
+      var day = parseInt(countDown / 1000 / 60 / 60 / 24); // 倒计时多少天
+      day = day < 10 ? '0' + day : day; // 三元运算符判断天数是否小于10，小于的话在前边加个0（为了看起来不别扭）
+      var hh = parseInt(countDown / 1000 / 60 / 60 % 24); // 倒计时多少小时
+      hh = hh < 10 ? '0' + hh : hh;
+      var mm = parseInt(countDown / 1000 / 60 % 60); // 倒计时多少分钟
+      mm = mm < 10 ? '0' + mm : mm;
+      var ss = parseInt(countDown / 1000 % 60); // 倒计时多少秒
+      ss = ss < 10 ? '0' + ss : ss;
+      docTitle(hh, mm, ss)
+      $('#countDownHH').html(hh);
+      $('#countDownMM').html(mm);
+      $('#countDownSS').html(ss);
+      return { day, hh, mm, ss };
+    }
+
+    function docTitle(hh, mm, ss) {
+      document.title = hh + ':' + mm + ':' + ss;
+    }
+
+    $.extend({
+      formatData: function () {
+        var time, YYYYMMDD;
+        var now = new Date();
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+        var hh = now.getHours();            //时
+        var mm = now.getMinutes();          //分
+        var ss = now.getSeconds();           //秒
+        var time = year + "-";
+        var YYYYMMDD = year + "-";
+        if (month < 10) {
+          time += "0";
+          time += month + "-";
+          YYYYMMDD += "0";
+          YYYYMMDD += month + "-";
+        } else {
+          time += month + "-";
+          YYYYMMDD += month + "-";
+        }
+        if (day < 10) {
+          time += "0";
+          time += day + " ";
+          YYYYMMDD += "0";
+          YYYYMMDD += day;
+        } else {
+          time += day + " ";
+          YYYYMMDD += day;
+        }
+        if (hh < 10) {
+          time += "0";
+          time += hh + ":";
+          hh = '0' + hh;
+        } else {
+          time += hh + ":";
+          hh = hh;
+        }
+        if (mm < 10) {
+          time += '0';
+          time += mm + ":";
+          mm = '0' + mm;
+        } else {
+          time += mm + ":";
+          mm = mm;
+        }
+        if (ss < 10) {
+          time += '0' + ss;
+          ss = '0' + ss;
+        } else {
+          time += ss;
+          ss = ss;
+        }
+        return { time, YYYYMMDD, year, month, day, hh, mm, ss };
+      },
+      formatDataNext: function () {
+        var time, YYYYMMDD;
+        var curDate = new Date()
+        var now = new Date(curDate.getTime() + 24 * 60 * 60 * 1000); // 后一天
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+        var hh = now.getHours();            //时
+        var mm = now.getMinutes();          //分
+        var ss = now.getSeconds();           //秒
+        var time = year + "-";
+        var YYYYMMDD = year + "-";
+        if (month < 10) {
+          time += "0";
+          time += month + "-";
+          YYYYMMDD += "0";
+          YYYYMMDD += month + "-";
+        } else {
+          time += month + "-";
+          YYYYMMDD += month + "-";
+        }
+        if (day < 10) {
+          time += "0";
+          time += day + " ";
+          YYYYMMDD += "0";
+          YYYYMMDD += day;
+        } else {
+          time += day + " ";
+          YYYYMMDD += day;
+        }
+        if (hh < 10) {
+          time += "0";
+          time += hh + ":";
+          hh = '0' + hh;
+        } else {
+          time += hh + ":";
+          hh = hh;
+        }
+        if (mm < 10) {
+          time += '0';
+          time += mm + ":";
+          mm = '0' + mm;
+        } else {
+          time += mm + ":";
+          mm = mm;
+        }
+        if (ss < 10) {
+          time += '0' + ss;
+          ss = '0' + ss;
+        } else {
+          time += ss;
+          ss = ss;
+        }
+        return { time, YYYYMMDD, year, month, day, hh, mm, ss };
+      }
+    })
+  </script>
+</body>
+
+</html>
