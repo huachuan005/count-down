@@ -267,12 +267,15 @@
         var setTime1 = new Date(setTime[0].timeYYYYMMDD.replace(/-/g, '/').valueOf())
         var setTime2 = new Date(setTime[1].timeYYYYMMDD.replace(/-/g, '/').valueOf())
         var setTime3 = new Date(setTime[2].timeYYYYMMDD.replace(/-/g, '/').valueOf())
+        var setTime4 = new Date(setTime[3].timeYYYYMMDD.replace(/-/g, '/').valueOf())
         if (setTime1 - currentTimestamp > 0) {
           tempTime = setTime1
         } else if (setTime2 - currentTimestamp > 0) {
           tempTime = setTime2
         } else if (setTime3 - currentTimestamp > 0) {
           tempTime = setTime3
+        } else if (setTime4 - currentTimestamp > 0) {
+          tempTime = setTime4
         }
       } else {
         tempTime = (new Date(setTime.replace(/-/g, '/').valueOf()))
